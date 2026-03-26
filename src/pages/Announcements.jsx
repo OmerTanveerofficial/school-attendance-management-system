@@ -6,9 +6,9 @@ import Modal from '../components/Modal';
 import { formatDate } from '../utils/helpers';
 
 const priorityConfig = {
-  high: { bg: '#fee2e2', text: '#dc2626', border: '#fca5a5', label: 'High' },
-  medium: { bg: '#fef3c7', text: '#d97706', border: '#fcd34d', label: 'Medium' },
-  low: { bg: '#d1fae5', text: '#059669', border: '#6ee7b7', label: 'Low' },
+  high: { bg: 'rgba(239, 68, 68, 0.06)', text: '#b91c1c', border: 'rgba(239, 68, 68, 0.15)', label: 'High', dot: '#ef4444' },
+  medium: { bg: 'rgba(217, 119, 6, 0.06)', text: '#92400e', border: 'rgba(217, 119, 6, 0.15)', label: 'Medium', dot: '#d97706' },
+  low: { bg: 'rgba(16, 185, 129, 0.06)', text: '#065f46', border: 'rgba(16, 185, 129, 0.15)', label: 'Low', dot: '#10b981' },
 };
 
 export default function Announcements() {
@@ -69,7 +69,8 @@ export default function Announcements() {
           </div>
           {(isAdmin || isTeacher) && (
             <button className="btn btn-primary" onClick={() => setShowCreate(true)}>
-              + New Announcement
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
+              New announcement
             </button>
           )}
         </div>
@@ -78,54 +79,57 @@ export default function Announcements() {
       <div className="filter-buttons" style={{ marginBottom: 16 }}>
         {['all', 'high', 'medium', 'low'].map(f => (
           <button key={f} className={`filter-btn ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
-            {f === 'all' ? 'All' : priorityConfig[f].label + ' Priority'}
+            {f === 'all' ? 'All' : priorityConfig[f].label + ' priority'}
           </button>
         ))}
       </div>
 
       <div className="ann-list">
-        {filtered.map(ann => {
+        {filtered.map((ann, idx) => {
           const pc = priorityConfig[ann.priority];
           return (
-            <div key={ann.id} className={`card ann-card ${ann.pinned ? 'ann-pinned' : ''}`}>
-              <div className="ann-card-content">
-                <div className="ann-card-top">
-                  <div className="ann-title-row">
-                    {ann.pinned && <span className="ann-pin-icon" title="Pinned">&#128204;</span>}
-                    <h3>{ann.title}</h3>
-                  </div>
-                  <span className="ann-priority-badge" style={{ background: pc.bg, color: pc.text, borderColor: pc.border }}>
-                    {pc.label}
-                  </span>
+            <div key={ann.id} className={`ann-item ${ann.pinned ? 'ann-pinned' : ''}`} style={{ animationDelay: `${idx * 50}ms` }}>
+              {ann.pinned && (
+                <div className="ann-pin-indicator">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M16 2v5.586l1.707 1.707A1 1 0 0118 10v2a1 1 0 01-1 1h-4v7a1 1 0 01-2 0v-7H7a1 1 0 01-1-1v-2a1 1 0 01.293-.707L8 8.586V2a1 1 0 011-1h6a1 1 0 011 1z"/>
+                  </svg>
+                  <span>Pinned</span>
                 </div>
-                <p className="ann-body">{ann.body}</p>
-                <div className="ann-footer">
-                  <div className="ann-author">
-                    <span className="ann-author-avatar">{ann.author?.charAt(0)}</span>
-                    <div>
-                      <span className="ann-author-name">{ann.author}</span>
-                      <span className="ann-author-role">{ann.authorRole}</span>
-                    </div>
+              )}
+              <div className="ann-item-header">
+                <h3>{ann.title}</h3>
+                <span className="ann-priority" style={{ background: pc.bg, color: pc.text }}>
+                  <span className="ann-priority-dot" style={{ background: pc.dot }} />
+                  {pc.label}
+                </span>
+              </div>
+              <p className="ann-body">{ann.body}</p>
+              <div className="ann-footer">
+                <div className="ann-author">
+                  <span className="ann-author-avatar">{ann.author?.charAt(0)}</span>
+                  <div>
+                    <span className="ann-author-name">{ann.author}</span>
+                    <span className="ann-author-role">{ann.authorRole}</span>
                   </div>
-                  <span className="ann-date">{formatDate(ann.date)}</span>
-                  {ann.targetClasses.length > 0 && (
-                    <div className="ann-target-classes">
-                      {ann.targetClasses.map(cid => (
-                        <span key={cid} className="exam-class-chip">{cid}</span>
-                      ))}
-                    </div>
-                  )}
                 </div>
+                <span className="ann-date">{formatDate(ann.date)}</span>
               </div>
             </div>
           );
         })}
         {filtered.length === 0 && (
-          <div className="empty-state"><p>No announcements found.</p></div>
+          <div className="leave-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--gray-300)' }}>
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+            </svg>
+            <h3>No announcements</h3>
+            <p>No announcements match the current filter.</p>
+          </div>
         )}
       </div>
 
-      <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="Create Announcement">
+      <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="Create announcement">
         <form onSubmit={handleCreate}>
           <div className="form-group">
             <label htmlFor="ann-title">Title</label>
@@ -146,7 +150,7 @@ export default function Announcements() {
           <div className="modal-actions">
             <button type="button" className="btn btn-outline" onClick={() => setShowCreate(false)}>Cancel</button>
             <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'Posting...' : 'Post Announcement'}
+              {saving ? 'Posting...' : 'Post announcement'}
             </button>
           </div>
         </form>

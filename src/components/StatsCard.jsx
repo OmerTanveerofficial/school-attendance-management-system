@@ -1,7 +1,7 @@
-export default function StatsCard({ title, value, subtitle, icon, color = '#2563eb' }) {
+export default function StatsCard({ title, value, subtitle, icon, color = '#0ea5e9' }) {
   return (
     <div className="stats-card">
-      <div className="stats-card-icon" style={{ backgroundColor: color + '15', color }}>
+      <div className="stats-card-icon" style={{ backgroundColor: color + '10', color }}>
         {icon}
       </div>
       <div className="stats-card-content">
